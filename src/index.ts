@@ -1,10 +1,10 @@
 import { registerPlugin } from '@capacitor/core';
 
-import type { ExamplePlugin } from './definitions';
+import type { SolanaMobileWalletAdapterModule } from './definitions';
 
-const Example = registerPlugin<ExamplePlugin>('Example', {
-  web: () => import('./web').then(m => new m.ExampleWeb()),
+const SolanaMobileWalletAdapter = registerPlugin<SolanaMobileWalletAdapterModule>('SolanaMobileWalletAdapter', {
+  web: () => import('./web').then(m => new m.SolanaMobileWalletAdapterWeb()),
 });
 
 export * from './definitions';
-export { Example };
+export { SolanaMobileWalletAdapter };
