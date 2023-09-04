@@ -1,8 +1,7 @@
-package one.svt.plugins.solanawallet
-// package com.solanamobile.mobilewalletadapter.capacitor
+package com.solanamobile.mobilewalletadapter.capacitor
 
 import android.app.Activity
-import android.app.Instrumentation.ActivityResult
+import androidx.activity.result.ActivityResult
 import android.content.ActivityNotFoundException
 import android.net.Uri
 import android.util.Log
@@ -27,8 +26,7 @@ import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
-
-@CapacitorPlugin(name = "SolanaMobileWalletAdapter")
+@CapacitorPlugin(name = "SolanaMobileWalletAdapterModule")
 class SolanaMobileWalletAdapterModule: Plugin(), CoroutineScope {
 
     data class SessionState(
@@ -67,12 +65,6 @@ class SolanaMobileWalletAdapterModule: Plugin(), CoroutineScope {
 //            localAssociation.close()
         }
     }
-    
-    @PluginMethod
-    fun echo(call: PluginCall) {
-        val value = call.getString("value")
-        value?.let { Log.d("TAG echo: ", it) }
-    }
 
     @PluginMethod
     fun startSession(call: PluginCall) = launch {
@@ -82,9 +74,7 @@ class SolanaMobileWalletAdapterModule: Plugin(), CoroutineScope {
 
         try {
             val uriPrefix = call.getString("baseUri")?.let { Uri.parse(it) }
-            val localAssociation = LocalAssociationScenario(
-                CLIENT_TIMEOUT_MS,
-            )
+            val localAssociation = LocalAssociationScenario(CLIENT_TIMEOUT_MS)
             val intent = LocalAssociationIntentCreator.createAssociationIntent(
                 uriPrefix,
                 localAssociation.port,
@@ -149,7 +139,7 @@ class SolanaMobileWalletAdapterModule: Plugin(), CoroutineScope {
             try {
                 withContext(Dispatchers.IO) {
                     it.localAssociation.close()
-                            .get(ASSOCIATION_TIMEOUT_MS.toLong(), TimeUnit.MILLISECONDS)
+                        .get(ASSOCIATION_TIMEOUT_MS.toLong(), TimeUnit.MILLISECONDS)
                 }
                 cleanup()
                 call.resolve()
