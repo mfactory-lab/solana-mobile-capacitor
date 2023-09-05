@@ -140,7 +140,7 @@ async function baseTransact<TReturn>(
         return false;
       },
     });
-    return callback(wallet);
+    return await callback(wallet);
   } catch (e) {
     return handleError(e);
   } finally {
