@@ -25,7 +25,7 @@ import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
-@CapacitorPlugin(name = "SolanaMobileWalletAdapterModule")
+@CapacitorPlugin(name = "SolanaMobileWalletAdapterModule", requestCodes = [0])
 class SolanaMobileWalletAdapterModule: Plugin(), CoroutineScope {
 
     data class SessionState(
