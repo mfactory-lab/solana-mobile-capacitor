@@ -1,4 +1,5 @@
 import { WebPlugin } from '@capacitor/core';
+import type { WalletAssociationConfig } from '@solana-mobile/mobile-wallet-adapter-protocol';
 
 import type {
   SolanaMobileWalletAdapterModule,
@@ -10,8 +11,8 @@ export class SolanaMobileWalletAdapterWeb extends WebPlugin implements SolanaMob
     return options;
   }
 
-  async startSession(options: { config: any }): Promise<void> {
-    console.log('[ExamplePlugin] startSession config: ', options?.config)
+  async startSession(config?: WalletAssociationConfig): Promise<void> {
+    console.log('[ExamplePlugin] startSession config: ', config)
     // logic here
   }
 

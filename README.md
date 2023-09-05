@@ -16,6 +16,7 @@ npx cap sync
 * [`startSession(...)`](#startsession)
 * [`invoke(...)`](#invoke)
 * [`endSession()`](#endsession)
+* [Type Aliases](#type-aliases)
 
 </docgen-index>
 
@@ -25,12 +26,12 @@ npx cap sync
 ### startSession(...)
 
 ```typescript
-startSession(options: { config?: any; }) => Promise<void>
+startSession(config?: Readonly<{ baseUri?: string | undefined; }> | undefined) => Promise<void>
 ```
 
-| Param         | Type                           |
-| ------------- | ------------------------------ |
-| **`options`** | <code>{ config?: any; }</code> |
+| Param        | Type                                                                       |
+| ------------ | -------------------------------------------------------------------------- |
+| **`config`** | <code><a href="#readonly">Readonly</a>&lt;{ baseUri?: string; }&gt;</code> |
 
 --------------------
 
@@ -55,5 +56,20 @@ endSession() => Promise<void>
 ```
 
 --------------------
+
+
+### Type Aliases
+
+
+#### WalletAssociationConfig
+
+<code><a href="#readonly">Readonly</a>&lt;{ baseUri?: string; }&gt;</code>
+
+
+#### Readonly
+
+Make all properties in T readonly
+
+<code>{ readonly [P in keyof T]: T[P]; }</code>
 
 </docgen-api>
