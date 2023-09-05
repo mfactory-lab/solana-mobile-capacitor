@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "allowUnreachableCode": false,
-    "allowSyntheticDefaultImports": true,
     "declaration": true,
     "esModuleInterop": true,
     "inlineSources": true,

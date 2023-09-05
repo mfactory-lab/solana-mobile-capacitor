@@ -11,7 +11,7 @@
     "android/build.gradle",
     "dist/",
     "ios/Plugin/",
-    "SolanaWalletCapacitor.podspec"
+    "SolanaMobileCapacitor.podspec"
   ],
   "author": "jFactory Team",
   "license": "MIT",
@@ -29,10 +29,9 @@
     "lint": "npm run eslint && npm run prettier -- --check && npm run swiftlint -- lint",
     "fmt": "npm run eslint -- --fix && npm run prettier -- --write && npm run swiftlint -- --fix --format",
     "eslint": "eslint . --ext ts",
-    "prettier": "prettier \"**/*.{css,html,ts,js,java}\"",
     "swiftlint": "node-swiftlint",
     "docgen": "docgen --api SolanaMobileWalletAdapterModule --output-readme README.md --output-json dist/docs.json",
-    "build": "npm run clean && npm run docgen && tsc && rollup -c rollup.config.js",
+    "build": "npm run clean && npm run docgen && tsc && rollup -c rollup.config.ts --configPlugin rollup-plugin-ts",
     "clean": "rimraf ./dist",
     "watch": "tsc --watch",
     "prepublishOnly": "npm run build"
@@ -40,27 +39,25 @@
   "dependencies": {
     "@solana-mobile/mobile-wallet-adapter-protocol": "^2.0.1",
     "bs58": "^5.0.0",
-    "js-base64": "^3.7.2"
+    "js-base64": "^3.7.5"
   },
   "devDependencies": {
-    "@capacitor/android": "^5.0.0",
-    "@capacitor/core": "^5.0.0",
-    "@capacitor/docgen": "^0.0.18",
-    "@capacitor/ios": "^5.0.0",
+    "@capacitor/android": "^5.3.0",
+    "@capacitor/core": "^5.3.0",
+    "@capacitor/docgen": "^0.2.1",
+    "@capacitor/ios": "^5.3.0",
     "@ionic/eslint-config": "^0.3.0",
-    "@ionic/prettier-config": "^1.0.1",
     "@ionic/swiftlint-config": "^1.1.2",
-    "eslint": "^7.11.0",
-    "prettier": "~2.3.0",
-    "prettier-plugin-java": "~1.0.2",
-    "rimraf": "^3.0.2",
-    "rollup": "^2.32.0",
-    "swiftlint": "^1.0.1",
-    "typescript": "~4.1.5"
+    "eslint": "^8.48.0",
+    "rimraf": "^5.0.1",
+    "rollup": "^3.28.1",
+    "rollup-plugin-ts": "^3.0.2",
+    "swiftlint": "^1.0.2",
+    "typescript": "^4.9.4"
   },
   "peerDependencies": {
     "@solana/web3.js": "^1.78.0",
-    "@capacitor/core": "^5.0.0"
+    "@capacitor/core": "^5.3.0"
   },
   "prettier": "@ionic/prettier-config",
   "swiftlint": "@ionic/swiftlint-config",

@@ -1,11 +1,11 @@
-# solana-wallet-capacitor
+# solana-mobile-capacitor
 
 connect to native solana wallets
 
 ## Install
 
 ```bash
-npm install solana-wallet-capacitor
+npm install solana-mobile-capacitor
 npx cap sync
 ```
 
