@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
 @CapacitorPlugin(name = "SolanaMobileWalletAdapterModule")
-class SolanaMobileWalletAdapterModule: Plugin, CoroutineScope {
+class SolanaMobileWalletAdapterModule: Plugin(), CoroutineScope {
 
     data class SessionState(
         val client: MobileWalletAdapterClient,
