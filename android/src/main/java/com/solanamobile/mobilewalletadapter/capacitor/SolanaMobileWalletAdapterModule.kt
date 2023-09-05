@@ -50,6 +50,8 @@ class SolanaMobileWalletAdapterModule: Plugin(), CoroutineScope {
 
     @Deprecated("Deprecated")
     override fun handleOnActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        Log.d(getName(), "handle requestCode $requestCode with data: ${data?.data}")
+
         mActivityEventCallbacks[requestCode]?.let { callback ->
             callback(resultCode, data)
             mActivityEventCallbacks.remove(requestCode)
