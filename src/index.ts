@@ -113,7 +113,6 @@ async function baseTransact<TReturn>(
     callback: (wallet: MobileWallet) => TReturn,
     config?: WalletAssociationConfig,
 ): Promise<TReturn> {
-  console.log('[capacitor_wallet] transact ===========================================================')
   let didSuccessfullyConnect = false;
   try {
     // @ts-expect-error ...
