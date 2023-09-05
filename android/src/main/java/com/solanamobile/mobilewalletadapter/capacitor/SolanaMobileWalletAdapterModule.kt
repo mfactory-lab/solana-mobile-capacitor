@@ -1,15 +1,14 @@
 package com.solanamobile.mobilewalletadapter.capacitor
 
 import android.app.Activity
-import androidx.activity.result.ActivityResult
 import android.content.ActivityNotFoundException
+import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import com.getcapacitor.JSObject
 import com.getcapacitor.Plugin
 import com.getcapacitor.PluginCall
 import com.getcapacitor.PluginMethod
-import com.getcapacitor.annotation.ActivityCallback
 import com.getcapacitor.annotation.CapacitorPlugin
 import com.solana.mobilewalletadapter.clientlib.protocol.JsonRpc20Client
 import com.solana.mobilewalletadapter.clientlib.protocol.MobileWalletAdapterClient
@@ -22,7 +21,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.withContext
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
@@ -41,37 +39,32 @@ class SolanaMobileWalletAdapterModule: Plugin(), CoroutineScope {
     companion object {
         private const val ASSOCIATION_TIMEOUT_MS = 10000
         private const val CLIENT_TIMEOUT_MS = 90000
+        private const val REQUEST_LOCAL_ASSOCIATION = 0
 
         // Used to ensure that you can't start more than one session at a time.
         private val mutex: Mutex = Mutex()
         private var sessionState: SessionState? = null
     }
 
-    private fun getName(): String {
-        return "SolanaMobileWalletAdapter"
+    private val mActivityEventCallbacks = mutableMapOf<Int, (Int, Intent?) -> (Unit)>()
+
+    @Deprecated("Deprecated")
+    override fun handleOnActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        mActivityEventCallbacks[requestCode]?.let { callback ->
+            callback(resultCode, data)
+            mActivityEventCallbacks.remove(requestCode)
+        }
     }
 
-    @ActivityCallback
-    private fun handleLocalAssociation(call: PluginCall?, result: ActivityResult) {
-        if (call == null) {
-            return
-        }
-        if (result.resultCode == Activity.RESULT_CANCELED) {
-            Log.d(getName(), "Local association cancelled by user, ending session")
-            call.reject(
-                "Session not established: Local association cancelled by user",
-                LocalAssociationScenario.ConnectionFailedException("Local association cancelled by user")
-            )
-//            // TODO: https://github.com/solana-mobile/mobile-wallet-adapter/blob/db64eb559547ebd5abc4fe7e4e94865e694b84ff/js/packages/mobile-wallet-adapter-protocol/android/src/main/java/com/solanamobile/mobilewalletadapter/reactnative/SolanaMobileWalletAdapterModule.kt#L86C34-L86C34
-//            localAssociation.close()
-        }
+    private fun getName(): String {
+        return "SolanaMobileWalletAdapter"
     }
 
     @PluginMethod
     fun startSession(call: PluginCall) = launch {
         mutex.lock()
 
-        Log.d(getName(), "startSession with data ${call.data}")
+        Log.d(getName(), "startSession with config ${call.data}")
 
         try {
             val uriPrefix = call.getString("baseUri")?.let { Uri.parse(it) }
@@ -81,10 +74,18 @@ class SolanaMobileWalletAdapterModule: Plugin(), CoroutineScope {
                 localAssociation.port,
                 localAssociation.session
             )
-            startActivityForResult(call, intent, "handleLocalAssociation")
+
+            launchIntent(intent, REQUEST_LOCAL_ASSOCIATION) { resultCode, _ ->
+                if (resultCode == Activity.RESULT_CANCELED) {
+                    Log.d(getName(), "Local association cancelled by user, ending session")
+                    call.reject("Session not established: Local association cancelled by user",
+                        LocalAssociationScenario.ConnectionFailedException("Local association cancelled by user"))
+                    localAssociation.close()
+                }
+            }
+
             val client = localAssociation.start().get(ASSOCIATION_TIMEOUT_MS.toLong(), TimeUnit.MILLISECONDS)
             sessionState = SessionState(client, localAssociation)
-            Log.d(getName(), "Session was started!")
             call.resolve()
         } catch (e: ActivityNotFoundException) {
             Log.e(getName(), "Found no installed wallet that supports the mobile wallet protocol", e)
@@ -153,6 +154,15 @@ class SolanaMobileWalletAdapterModule: Plugin(), CoroutineScope {
             }
         }
     } ?: throw NullPointerException("Tried to end a session without an active session")
+
+    private fun launchIntent(intent: Intent, requestCode: Int, callback: (Int, Intent?) -> (Unit)) {
+        mActivityEventCallbacks[requestCode] = callback
+
+        bridge?.activity?.startActivityForResult(intent, REQUEST_LOCAL_ASSOCIATION) ?: run {
+            mActivityEventCallbacks.remove(requestCode)
+            throw NullPointerException("Could not find a current activity from which to launch a local association")
+        }
+    }
 
     private fun cleanup() {
         sessionState = null

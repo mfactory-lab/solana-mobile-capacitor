@@ -53,7 +53,7 @@ export interface Web3MobileWallet
 function getPayloadFromTransaction(transaction: LegacyTransaction | VersionedTransaction): Base64EncodedTransaction {
   const serializedTransaction =
       'version' in transaction
-          ? (transaction as any).serialize()
+          ? transaction.serialize()
           : transaction.serialize({
             requireAllSignatures: false,
             verifySignatures: false,
@@ -72,10 +72,9 @@ function getTransactionFromWireMessage(byteArray: Uint8Array): Transaction | Ver
   }
 }
 
+type CapacitorError = Error & { code?: string; userInfo?: Record<string, unknown> };
 
-type ReactNativeError = Error & { code?: string; userInfo?: Record<string, unknown> };
-
-function getErrorMessage(e: ReactNativeError): string {
+function getErrorMessage(e: CapacitorError): string {
   switch (e.code) {
     case 'ERROR_WALLET_NOT_FOUND':
       return 'Found no installed wallet that supports the mobile wallet protocol.';
@@ -86,7 +85,7 @@ function getErrorMessage(e: ReactNativeError): string {
 
 function handleError(e: any): never {
   if (e instanceof Error) {
-    const reactNativeError: ReactNativeError = e;
+    const reactNativeError: CapacitorError = e;
     switch (reactNativeError.code) {
       case undefined:
         throw e;
@@ -115,7 +114,6 @@ async function baseTransact<TReturn>(
 ): Promise<TReturn> {
   let didSuccessfullyConnect = false;
   try {
-    // @ts-expect-error ...
     await SolanaMobileWalletAdapter.startSession(config);
     didSuccessfullyConnect = true;
     const wallet = new Proxy<MobileWallet>({} as MobileWallet, {
