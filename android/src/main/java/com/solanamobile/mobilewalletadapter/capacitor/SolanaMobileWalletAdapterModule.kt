@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
 @CapacitorPlugin(name = "SolanaMobileWalletAdapterModule")
-class SolanaMobileWalletAdapterModule: Plugin(), CoroutineScope {
+class SolanaMobileWalletAdapterModule: Plugin, CoroutineScope {
 
     data class SessionState(
         val client: MobileWalletAdapterClient,
@@ -82,10 +82,9 @@ class SolanaMobileWalletAdapterModule: Plugin(), CoroutineScope {
                 localAssociation.session
             )
             startActivityForResult(call, intent, "handleLocalAssociation")
-            val client = withContext(Dispatchers.IO) {
-                localAssociation.start().get(ASSOCIATION_TIMEOUT_MS.toLong(), TimeUnit.MILLISECONDS)
-            }
+            val client = localAssociation.start().get(ASSOCIATION_TIMEOUT_MS.toLong(), TimeUnit.MILLISECONDS)
             sessionState = SessionState(client, localAssociation)
+            Log.d(getName(), "Session was started!")
             call.resolve()
         } catch (e: ActivityNotFoundException) {
             Log.e(getName(), "Found no installed wallet that supports the mobile wallet protocol", e)
@@ -140,10 +139,7 @@ class SolanaMobileWalletAdapterModule: Plugin(), CoroutineScope {
         launch {
             Log.d(getName(), "endSession")
             try {
-                withContext(Dispatchers.IO) {
-                    it.localAssociation.close()
-                        .get(ASSOCIATION_TIMEOUT_MS.toLong(), TimeUnit.MILLISECONDS)
-                }
+                it.localAssociation.close().get(ASSOCIATION_TIMEOUT_MS.toLong(), TimeUnit.MILLISECONDS)
                 cleanup()
                 call.resolve()
             } catch (e: TimeoutException) {
