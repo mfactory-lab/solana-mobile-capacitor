@@ -4,7 +4,7 @@ export default {
     {
       file: 'dist/plugin.js',
       format: 'iife',
-      name: 'capacitorExample',
+      name: 'capacitorSolanaMobile',
       globals: {
         '@capacitor/core': 'capacitorExports',
       },
