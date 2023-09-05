@@ -115,7 +115,9 @@ class SolanaMobileWalletAdapterModule: Plugin(), CoroutineScope {
         val params = call.getObject("params")
         try {
             Log.d(getName(), "invoke `$method` with params $params")
-            val result = it.client.methodCall(method, params, CLIENT_TIMEOUT_MS).get() as JSObject
+            val result = JSObject.fromJSONObject(
+                it.client.methodCall(method, params, CLIENT_TIMEOUT_MS).get() as JSONObject
+            )
             call.resolve(result)
         } catch (e: ExecutionException) {
             val cause = e.cause
